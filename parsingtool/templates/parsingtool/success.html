@@ -1,0 +1,31 @@
+{% extends "base_generic.html" %}
+
+{% load static %}
+
+{% block content %}
+
+
+  {% if downloadurl %}
+  <h4>File can be downloaded at: <a href="{{ downloadurl }}">Click to Download</a></h4>
+  {% endif %}
+
+  <table class="table" style="width: 100%;"  >
+    <thead>
+      <tr role="row">
+        <th style="width: 50px;">Cluster Index</th>
+        <th style="width: 50px;">Number of Each Cluster</th>
+        <th style="width: 300px;">Keywords</th>
+      </tr>
+    </thead>
+    <tbody> 
+        {% for ind in clusters %}
+                <tr>
+                    <td>{{ind.index}}</td>
+                    <td>{{ ind.numObs }}</td>
+                    <td>{{ ind.keyword }}</td>
+                </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}

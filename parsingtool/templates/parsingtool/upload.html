@@ -1,0 +1,90 @@
+{% extends "base_generic.html" %}
+
+{% load static %}
+
+{% block content %}
+  <script>
+
+$(document).ready(function() {
+    $(".spinner").hide()
+    $('#target').trigger("reset");
+} );
+
+$('input[name^="csvfile"]').each(function () {
+    $(this).rules('add', {
+        required: true,
+        accept: "csv"
+    })
+})
+
+
+$(function() {
+
+  $('#target').on("submit",function(e) {
+    // e.preventDefault(); 
+    $(".spinner").show()
+    $('#csvfile').rules('add', {
+        required: true,
+        accept: "csv"
+    })
+  });
+});
+  </script>
+  <div class="spinner" ></div>
+  <p></p>
+  <p></p>
+  <h2>Topic Text Mining </h2>
+  <p></p>
+  <p></p>
+  <p> This text mining tool is using K Means algorithm to create the similar topics clusters by keywords from unstructured text documents like search results. For big data set, it may take minutes to process. Please do not refresh the page. After process is done, it will redirect to download page </p>
+  
+  <form id="target" method="post" class="doc-input" enctype="multipart/form-data" action="#">
+    {% csrf_token %}
+    <table class="table">
+        <tr>
+            <td class="col-sm-8"><label for="csvfile">Import Source File (.csv format)</label></td>
+            <td class="col-sm-4"><input id="csvfile" name="csvfile" required type="file"></td>
+        </tr>
+        <tr>
+            <td><label for="textcol">Column Index containing text to analyze (example: B column index is 2)</label></td>
+            <td><input id="textcol" name="textcol" required type="text" value="2"></td>
+
+        </tr>
+        <tr>
+            <td><label for="ntop">Number of Clusters/Topics</label></td>
+            <td><input id="ntop" name="ntop" required type="text" value="10"></td>
+
+        </tr>
+        <tr>
+            <td><label for="ng">Word grouping length (1 is recommended)</label></td>
+            <td><input id="ng" name="ng" required type="text" value="1"></td>
+
+        </tr>
+        <tr>
+            <td><label for="sw">Additional stop words(comma separated list)</label></td>
+            <td><textarea id="sw" name="sw" required>copyright, publication, abstract</textarea></td>
+
+        </tr>
+
+        <tr>
+            <td><button  class="btn btn-primary" name="submit" type="submit">Run Mining</button></td>
+            <td>
+              {% if downloadurl %}
+              <p>File uploaded at: <a href="{{ downloadurl }}">Click to Download</a></p>
+              {% endif %}
+              <div class="spinner-border text-success" id="loading"></div>
+            </td>
+
+        </tr>
+    </table>
+</form>
+
+{% if request.session.errormsg %}
+<div class="alert alert-danger ">
+    <strong>Error!</strong> {{ request.session.errormsg }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+</div>
+{% endif %}
+
+
+{% endblock %}
