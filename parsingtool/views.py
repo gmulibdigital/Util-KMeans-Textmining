@@ -162,7 +162,7 @@ def process_kmeans(name,path,km_data):
             dfdata =[]
             for i in tindex.index:
                 obj = {
-                    "index":topicIndex[i],
+                    "index":topicIndex[i] + 1 ,  #cluster show with 1-10 
                     "numObs":numObs[i],
                     "keyword":k[i]
                 }
@@ -170,7 +170,6 @@ def process_kmeans(name,path,km_data):
 
             outputdf = pd.concat([source_df,topic,tindex,numObs,tw], ignore_index=False, axis=1)
             outputdf.to_csv(filepath,index=False)
-            # print("save correctly")
             context = {
                 'errormsg' : '',
                 'filename' : name,
