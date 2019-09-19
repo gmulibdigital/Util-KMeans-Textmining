@@ -43,11 +43,11 @@ def simple_upload(request):
             fs = FileSystemStorage()
             filename = fs.save(csvfile.name, csvfile)
             # uploaded_file_url = fs.url(filename)
-            print("after saving file..." + filename)
+            # print("after saving file..." + filename)
             path = fs.path(filename)
             context = process_kmeans(csvfile.name,path,km_data)
             uploaded_file_url = settings.VHOST_PARAM + settings.MEDIA_URL + filename
-            print("file finished... csv created=" + uploaded_file_url)
+            # print("file finished... csv created=" + uploaded_file_url)
             context['downloadurl'] = uploaded_file_url
             return render_to_response("success.html", context)
         except Exception as  e:
@@ -134,7 +134,7 @@ def process_kmeans(name,path,km_data):
             print(tfidf_matrix.shape)
 
 
-            km = KMeans(n_clusters=numcluster,init='k-means++', max_iter=100, n_init=ng, algorithm='auto')
+            km = KMeans(n_clusters=numcluster,init='k-means++', max_iter=100, n_init=10, algorithm='auto')
             km.fit(tfidf_matrix)
     
             clusters = km.labels_.tolist()
@@ -149,8 +149,8 @@ def process_kmeans(name,path,km_data):
                 print("Cluster %d words:" % group, end='')
                 topicIndex.append(group)
                 keywords =''
-                for ind in order_centroids[group, :15]: 
-                    print(' %s' % terms[ind], end='|')
+                for ind in order_centroids[group, :10]: 
+                    # print(' %s' % terms[ind], end='|')
                     keywords += str(terms[ind]) +'|'
                 k.append(keywords)
             topic = pd.DataFrame({'Topic':clusters})
@@ -170,7 +170,7 @@ def process_kmeans(name,path,km_data):
 
             outputdf = pd.concat([source_df,topic,tindex,numObs,tw], ignore_index=False, axis=1)
             outputdf.to_csv(filepath,index=False)
-            print("save correctly")
+            # print("save correctly")
             context = {
                 'errormsg' : '',
                 'filename' : name,
