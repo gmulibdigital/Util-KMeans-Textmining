@@ -134,7 +134,7 @@ def process_kmeans(name,path,km_data):
             terms = tfidf_vectorizer.get_feature_names()
 
 
-            km = KMeans(n_clusters=numcluster,init='k-means++', max_iter=100, n_init=10, algorithm='auto')
+            km = KMeans(n_clusters=numcluster,init='k-means++', max_iter=100, n_init=3, algorithm='auto')
             km.fit(tfidf_matrix)
     
             clusters = km.labels_.tolist()
@@ -163,32 +163,28 @@ def process_kmeans(name,path,km_data):
             
             topic = pd.DataFrame({'Topic':clusters})
             numObs = topic['Topic'].value_counts()
-            tindex = pd.DataFrame({'TopicIndex':topicIndex})
-            tw = pd.DataFrame({'TopicKeyWords':k})
             name=re.sub(".csv","",name)
-
+            
             dfdata =[]
-
             for z in range(len(topicIndex)): 
                 obj = {
-                    "index":topicIndex[z],  
-                    "numObs":numObs[z+1],   #offset 1 because index start with 1 instead of 0
-                    "keyword":k[z]
+                    "TopixIndex":topicIndex[z],  
+                    "NumObs":numObs[z+1],   #offset 1 because index start with 1 instead of 0
+                    "Keyword":k[z]
                 }
                 dfdata.append(obj)
-            outputdf = pd.concat([source_df,topic,tindex,numObs,tw], ignore_index=False, axis=1)
-            outputdf.to_csv(filepath,index=False)
+            
+            df = pd.DataFrame(dfdata)
 
+            outputdf = pd.concat([source_df,topic,df], ignore_index=False, axis=1)
+            outputdf.to_csv(filepath,index=False)
             context = {
                 'errormsg' : '',
                 'filename' : name,
-                'topicindex'  : tindex,
-                'numObs'      : numObs,
-                'keyword'     : k,
                 'clusters'    : dfdata,
             }
         except Exception as  e:
-            print(str(e))
+            print(e)
 
         return context 
 # Create your views here.
