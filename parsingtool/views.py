@@ -134,7 +134,7 @@ def process_kmeans(name,path,km_data):
             terms = tfidf_vectorizer.get_feature_names()
 
 
-            km = KMeans(n_clusters=numcluster,init='k-means++', max_iter=100, n_init=3, algorithm='auto')
+            km = KMeans(n_clusters=numcluster,init='k-means++', max_iter=100, n_init=1, algorithm='auto')
             km.fit(tfidf_matrix)
     
             clusters = km.labels_.tolist()
@@ -175,7 +175,7 @@ def process_kmeans(name,path,km_data):
                 dfdata.append(obj)
             
             df = pd.DataFrame(dfdata)
-            df = df.reindex(columns=list(dfdata[0].keys()))
+            df = df.reindex(columns =["TopicIndex", "NumObs", "Keyword"])
             outputdf = pd.concat([source_df,topic,df], ignore_index=False, axis=1)
             outputdf.to_csv(filepath,index=False)
             context = {
