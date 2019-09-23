@@ -168,20 +168,20 @@ def process_kmeans(name,path,km_data):
             dfdata =[]
             for z in range(len(topicIndex)): 
                 obj = {
-                    "TopixIndex":topicIndex[z],  
+                    "TopicIndex":topicIndex[z],  
                     "NumObs":numObs[z+1],   #offset 1 because index start with 1 instead of 0
                     "Keyword":k[z]
                 }
                 dfdata.append(obj)
             
             df = pd.DataFrame(dfdata)
-
+            df = df.reindex(columns=list(dfdata[0].keys()))
             outputdf = pd.concat([source_df,topic,df], ignore_index=False, axis=1)
             outputdf.to_csv(filepath,index=False)
             context = {
                 'errormsg' : '',
                 'filename' : name,
-                'clusters'    : dfdata,
+                'clusters' : dfdata,
             }
         except Exception as  e:
             print(e)
