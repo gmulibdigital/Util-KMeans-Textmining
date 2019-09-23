@@ -27,7 +27,7 @@ lemmatizer = WordNetLemmatizer()
 def simple_upload(request):
     if request.method == 'POST' and request.FILES['csvfile']:
         try:
-            print("inside post....")
+
             csvfile = request.FILES['csvfile']
             error_message = validate_csv(csvfile)
             if error_message!='':
@@ -107,6 +107,7 @@ def tokenize_and_stem(text):
 
 def process_kmeans(name,path,km_data):
         try:
+            context = {}
             textcol = int(km_data.get("textcol"))
             numcluster = int(km_data.get("ntop"))
             ng = int(km_data.get("ng"))
@@ -131,7 +132,6 @@ def process_kmeans(name,path,km_data):
 
             tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
             terms = tfidf_vectorizer.get_feature_names()
-            print(tfidf_matrix.shape)
 
 
             km = KMeans(n_clusters=numcluster,init='k-means++', max_iter=100, n_init=10, algorithm='auto')
@@ -146,30 +146,39 @@ def process_kmeans(name,path,km_data):
             
             for group in set(clusters):
                 # print("\nGroup : ",group, "\n-------------------")
-                print("Cluster %d words:" % group, end='')
+                # print("Cluster %d words:" % group, end='')
                 topicIndex.append(group)
                 keywords =''
                 for ind in order_centroids[group, :10]: 
                     # print(' %s' % terms[ind], end='|')
                     keywords += str(terms[ind]) +'|'
                 k.append(keywords)
+
+            # add index start from 1 instead of 0 , user requested 
+            for i in range(len(clusters)): 
+                clusters[i] = clusters[i] + 1
+            
+            for j in range(len(topicIndex)): 
+                topicIndex[j] = topicIndex[j] + 1
+            
             topic = pd.DataFrame({'Topic':clusters})
             numObs = topic['Topic'].value_counts()
             tindex = pd.DataFrame({'TopicIndex':topicIndex})
             tw = pd.DataFrame({'TopicKeyWords':k})
             name=re.sub(".csv","",name)
-            
+
             dfdata =[]
-            for i in tindex.index:
+
+            for z in range(len(topicIndex)): 
                 obj = {
-                    "index":topicIndex[i] + 1 ,  #cluster show with 1-10 
-                    "numObs":numObs[i],
-                    "keyword":k[i]
+                    "index":topicIndex[z],  
+                    "numObs":numObs[z+1],   #offset 1 because index start with 1 instead of 0
+                    "keyword":k[z]
                 }
                 dfdata.append(obj)
-
             outputdf = pd.concat([source_df,topic,tindex,numObs,tw], ignore_index=False, axis=1)
             outputdf.to_csv(filepath,index=False)
+
             context = {
                 'errormsg' : '',
                 'filename' : name,
